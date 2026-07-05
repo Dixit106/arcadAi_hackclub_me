@@ -6,6 +6,9 @@ const ctx = canvas.getContext('2d');
 
 // 2. Global Game Variable
 let frames = 0; // Tracks game time
+let lives = 3;
+let score = 0;
+let gameOver = false;
 const groundY = 320; // where the floor sits on the Y axis
 
 // 3. Player Object Definition
@@ -19,21 +22,42 @@ const player = {
     jumpPower: -10, //How high the player jumps
     isGrounded: false,
     isAttacking: false,
-    attackTimer: 0 // How long the arm stays stretched
+    attackTimer: 0, // How long the arm stays stretched
+    //NEW: Damage mechanics
+    isInvincible: false,
+    invincibleTimer:0
 };
 
 //4. Enemy Array
 let enemies = [];
 
+// NEW: Reset Function for Game Over
+function resetGame() {
+    score = 0;
+    lives = 3;
+    gameOver = false;
+    enemies = [];
+    player.x = 50;
+    player.y = 200;
+    player.dy = 0;
+    player.isInvincible = false;
+    frames = 0;
+}
+
 //5. Input Handling (keyboard)
 document.addEventListener('keydown', (e) => {
+    //NEW: restart game if game over
+    if (gameOver && e.code === 'Enter') {
+        resetGame();
+        return;
+    }
     // Jump if space is pressed and we are on the ground
-    if (e.code === 'Space' && player.isGrounded) {
+    if (e.code === 'Space' && player.isGrounded && !gameOver) {
         player.dy = player.jumpPower;
         player.isGrounded = false;
     }
     // Attack if 'F' is pressed and we aren't already attacking
-    if (e.code === 'KeyF' && !player.isAttacking) {
+    if (e.code === 'KeyF' && !player.isAttacking && !gameOver) {
         player.isAttacking = true;
         player.attackTimer = 8; // The attack lasts for 8 frames
     }
@@ -41,6 +65,9 @@ document.addEventListener('keydown', (e) => {
 
 // 6. Update Game Logic (Physics, Movement, Collisions)
 function update() {
+    //New: Stop updating physics if Game Over
+    if (gameOver) return;
+
     //Apply gravity to player
     player.dy += player.gravity;
     player.y += player.dy;
@@ -85,9 +112,29 @@ function update() {
 
                 // Destroy enemy by removing from array 
                 enemies.splice(i, 1);
+
+                score += 100;
+                
                 continue; // Skip the rest of this loop iteration    
             }
         }
+
+        //New: Collision: Enemy hits Player
+        if (!player.isInvincible &&
+            e.x < player.x + player.w &&
+            e.x + e.w > player.x &&
+            e.y < player.y + player.h &&
+            e.y + e.h > player.y) {
+
+            lives--; //Take damage
+            player.isInvincible = true;
+            player.invincibleTimer = 60; //1 s of I-frames(at 60 fps)
+
+            if (lives <=0) {
+                gameOver = true;
+            }
+        }
+        
 
         // Remove enemies that scroll off the left side of the screen
         if (e.x + e.w < 0) {
@@ -100,6 +147,14 @@ function update() {
         player.attackTimer--;
         if (player.attackTimer <=0) {
             player.isAttacking = false; // Arm snaps back
+        }
+    }
+
+    // New: handle invinciblity timer
+    if (player.isInvincible) {
+        player.invincibleTimer--;
+        if (player.invincibleTimer <= 0) {
+            player.isInvincible = false;
         }
     }
 
@@ -120,9 +175,17 @@ function draw(){
     ctx.lineTo(canvas.width, groundY);
     ctx.stroke();
 
-    //Draw Player(Red Square)
-    ctx.fillStyle = 'red';
-    ctx.fillRect(player.x, player.y, player.w, player.h);
+    //New: Draw Score and Lives
+    ctx.fillStyle = 'black';
+    ctx.font = '20px "Comic Sans MS"';
+    ctx.fillText("SCORE: " + score, 20, 30);
+    ctx.fillText("LIVES: " + lives, canvas.width - 120, 30);
+
+    //New: Draw Player with blinking effect if invincible
+    if (!player.isInvincible || frames % 10 < 5) {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(player.x, player.y, player.w, player.h);
+    }
 
     //Draw Attack (yellow Rectangle stretching right)
     if (player.isAttacking) {
@@ -135,6 +198,23 @@ function draw(){
     enemies.forEach(enemy => {
         ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
     });
+
+    // NEW: Draw Game OVER SCREEN
+    if (gameOver) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; // Dark overlay
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = 'red';
+        ctx.font = 'bold 40px "Comic Sans MS"';
+        ctx.textAlign = 'center';
+        ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
+
+        ctx.fillStyle = 'yellow';
+        ctx.font = '20px "Comic Sans MS"';
+        ctx.fillText("Press ENTER to Restart", canvas.width / 2, canvas.height / 2 + 20);
+
+        ctx.textAlign = 'left'; // Reset text alignment for the next frame
+    }
 }
 
 //8. The Main Game Loop
