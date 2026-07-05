@@ -5,7 +5,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 // 2. Global Game Variable
-let frame = 0; // Tracks game time
+let frames = 0; // Tracks game time
 const groundY = 320; // where the floor sits on the Y axis
 
 // 3. Player Object Definition
@@ -19,7 +19,7 @@ const player = {
     jumpPower: -10, //How high the player jumps
     isGrounded: false,
     isAttacking: false,
-    attactTimer: 0 // How long the arm stays stretched
+    attackTimer: 0 // How long the arm stays stretched
 };
 
 //4. Enemy Array
@@ -45,7 +45,7 @@ function update() {
     player.dy += player.gravity;
     player.y += player.dy;
 
-    //Stop player from fallign through the ground
+    //Stop player from falling through the ground
     if (player.y + player.h >= groundY) {
         player.y = groundY - player.h;
         player.dy = 0;
@@ -77,32 +77,34 @@ function update() {
         e.x -= e.speed; //Move enemy left
 
         // Check collision between attack arm and enemy
-        if (player.isAttacking)
+        if (player.isAttacking) {
             if (e.x < attackBox.x + attackBox.w &&
-                e.y + e.w > attackBox.x &&
+                e.x + e.w > attackBox.x &&
                 e.y < attackBox.y + attackBox.h &&
                 e.y + e.h > attackBox.y) {
 
-                // Destroy enemy by removing from array enemies.splice(i, 1);
+                // Destroy enemy by removing from array 
+                enemies.splice(i, 1);
                 continue; // Skip the rest of this loop iteration    
-                }
+            }
+        }
+
+        // Remove enemies that scroll off the left side of the screen
+        if (e.x + e.w < 0) {
+            enemies.splice(i, 1);
+        }
     }
 
-    // Remove enemies that scroll off the left side of the screen
-    if (e.x + e.w < 0) {
-        enemies.splice(i, 1);
+    // Handle attack snapping back
+    if (player.isAttacking) {
+        player.attackTimer--;
+        if (player.attackTimer <=0) {
+            player.isAttacking = false; // Arm snaps back
+        }
     }
+
+    frames++;
 }
-
-// Handle attack snapping back
-if (player.isAttacking) {
-    player.attackTimer--;
-    if (player.attackTimer <=0) {
-        player.isAttacking = false; // Arm snaps back
-    }
-}
-
-frames++;
 
 //7. Draw Everything to the Screen
 function draw(){
