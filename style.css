@@ -1,0 +1,41 @@
+/* Web 1.0 aesthetic css */
+body{
+    background-color: #008080;
+    color: #FFFF00;
+    font-family: "Comic Sans MS", "Times New Roman", serif;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-decoration: underline;
+    font-size: 36px;
+}
+
+marquee {
+    width: 600px;
+    background-color: #000080;
+    color: #00FF00;
+    font-size: 18px;
+    padding: 5px;
+    border: 2px solid #C0C0C0;
+    margin-bottom: 10px;
+}
+
+#gameCanvas {
+    background-color: #87CEEB;
+    border: 8px ridge #C0C0C0;
+    box-shadow: 10px 10px 0px black;
+    display: block;
+    margin: 0 auto;
+}
+
+.instructions {
+    margin-top: 15px;
+    font-size: 18px;
+    background-color: black;
+    display: inline-block;
+    padding: 10px;
+    border: 2px dashed #FF00FF;
+}
