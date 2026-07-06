@@ -11,6 +11,26 @@ let score = 0;
 let gameOver = false;
 const groundY = 320; // where the floor sits on the Y axis
 
+//Image preloading
+const bgImg = new Image();
+bgImg.src = 'onepiecebackground.png';
+
+const luffyRunImg = new Image();
+luffyRunImg.src = 'luffy_running.png';
+
+const luffyPunchImg = new Image();
+luffyPunchImg.src = 'luffy_punch.png';
+
+// store marine img in array to pick random
+const marineImages = [
+    new Image(),
+    new Image(),
+    new Image()
+];
+marineImages[0].src = 'marrine_1.png';
+marineImages[1].src = 'marrine_2.png';
+marineImages[2].src = 'marrine_3.png';
+
 // 3. Player Object Definition
 const player = {
     x: 50,
@@ -81,12 +101,16 @@ function update() {
 
     //Spawn enemies every 90 frames (roughly 1.5 seconds)
     if (frames % 90 === 0) {
+        //Generate a random number: 0,1, or 2
+        let randomMarine = Math.floor(Math.random() * 3);
+
         enemies.push({
             x: canvas.width, // Spawn on the far right
             y: groundY - 30, // Sit perfectly on the ground
             w: 30,
             h: 30,
-            speed: 4 // Scroll speed to the left
+            speed: 4, // Scroll speed to the left
+            imageIndex: randomMarine
         });
     }
 
@@ -162,11 +186,11 @@ function update() {
 }
 
 //7. Draw Everything to the Screen
+//7. Draw Everything to the Screen
 function draw(){
-    // Clear canvas & Draw Sky Blue Background
-    ctx.fillStyle = '#87CEEB';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+    //background
+    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+    
     // Draw Flat Ground Line
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
@@ -175,31 +199,35 @@ function draw(){
     ctx.lineTo(canvas.width, groundY);
     ctx.stroke();
 
-    //New: Draw Score and Lives
+    // --- FIX: Player Drawing Logic Grouped Together ---
+    if (player.isAttacking) {
+        // Draw the punch sprite 
+        ctx.drawImage(luffyPunchImg, player.x, player.y, player.w, player.h);
+        
+        // Draw Attack (yellow Rectangle stretching right)
+        ctx.fillStyle = 'yellow';
+        ctx.fillRect(player.x + player.w, player.y + 10, 150, 10);
+    } else {
+        // Draw the running sprite if not attacking
+        if (!player.isInvincible || frames % 10 < 5) {
+            ctx.drawImage(luffyRunImg, player.x, player.y, player.w, player.h);
+        }
+    }
+    // --------------------------------------------------
+
+    // Draw Score and Lives
     ctx.fillStyle = 'black';
     ctx.font = '20px "Comic Sans MS"';
     ctx.fillText("SCORE: " + score, 20, 30);
     ctx.fillText("LIVES: " + lives, canvas.width - 120, 30);
 
-    //New: Draw Player with blinking effect if invincible
-    if (!player.isInvincible || frames % 10 < 5) {
-        ctx.fillStyle = 'red';
-        ctx.fillRect(player.x, player.y, player.w, player.h);
-    }
-
-    //Draw Attack (yellow Rectangle stretching right)
-    if (player.isAttacking) {
-        ctx.fillStyle = 'yellow';
-        ctx.fillRect(player.x + player.w, player.y + 10, 150, 10);
-    }
-
-    //Draw Enemies (Navy Blue Squares)
-    ctx.fillStyle = 'navy';
+    // Draw enemies
     enemies.forEach(enemy => {
-        ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
+        let currentMarineImg = marineImages[enemy.imageIndex];
+        ctx.drawImage(currentMarineImg, enemy.x, enemy.y, enemy.w, enemy.h);
     });
 
-    // NEW: Draw Game OVER SCREEN
+    // Draw Game OVER SCREEN
     if (gameOver) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; // Dark overlay
         ctx.fillRect(0, 0, canvas.width, canvas.height);
