@@ -8,18 +8,47 @@
 </head>
 <body>
     
-    <h1>Welcome to my Homepage!</h1>
+    <div class="main-container">
+        <h1><span class="blink">Welcome to my Homepage</span></h1>
 
-    <marquee scrollamount="5">Watch out for the Navy Blue Squares! Space to Jump, F to Attack!</marquee>
+        <hr size="4" color="#FF00FF">
 
-    <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <marquee scrollamount="6" class="scroller">
+            +++ UPDATE: Stretching attack! Press F to punch the Marines! +++ Watch out JUMP! +++ Best viewed in Netscape Navigator! +++
+        </marquee>
 
-    <div class="instructions">
-        <strong>CONTROLS:</strong><br>
-        [SPACEBAR] = Jump <br>
-        [F] = Stretch Arm Attack
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+
+        <div class="instructions">
+            <strong>CONTROLS</strong><br>
+            [SPACEBAR] = Jump <br>
+            [F] = Stretch Arm Attack
+        </div>
+
+        <hr size="4" color="#00FF00">
+
+        <div class="retro-footer">
+
+            <div class="webring">
+                <p>This site is proudly a member fo the:<br><strong>Grand Line Webring</strong></p>
+                <a href="#">[ << Prev ]</a> |
+                <a href="#">[ Random ]</a> |
+                <a href="#">[ Next >> ]</a>
+            </div>
+
+            <div class="badges">
+                <div class="badge html-badge">HTML 4.0<br>VALID</div>
+                <div class="badge netscape-badge">BEST IN<br>NETSCAPE</div>
+            </div>
+            <div class="counter">
+                You are visitor number:<br>
+                <span class="odometer">001337</span>
+            </div>
+            <p><a href="#">Sign my Guestbook!</a></p>
+            <p class="copyright">1999 Do not steal.</p>
+        </div>
     </div>
-    
+
     <script src="script.js"></script>
 
 </body>

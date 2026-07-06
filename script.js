@@ -35,8 +35,8 @@ marineImages[2].src = 'marrine_3.png';
 const player = {
     x: 50,
     y: 200,
-    w: 30, //Width
-    h: 30, //Height
+    w: 60, //Width
+    h: 60, //Height
     dy: 0, // Vertical velocity
     gravity: 0.6, // how fast the player falls
     jumpPower: -10, //How high the player jumps
@@ -106,9 +106,9 @@ function update() {
 
         enemies.push({
             x: canvas.width, // Spawn on the far right
-            y: groundY - 30, // Sit perfectly on the ground
-            w: 30,
-            h: 30,
+            y: groundY - 60, // Sit perfectly on the ground
+            w: 60,
+            h: 60,
             speed: 4, // Scroll speed to the left
             imageIndex: randomMarine
         });
@@ -117,7 +117,7 @@ function update() {
     //Define the attack hitbox(the yellow arm)
     let attackBox = {
         x: player.x + player.w,
-        y: player.y + 10,
+        y: player.y + 25,
         w: 150,
         h: 10
     };
@@ -144,11 +144,22 @@ function update() {
         }
 
         //New: Collision: Enemy hits Player
+
+        let pX = player.x + 15;
+        let pY = player.y + 10;
+        let pW = player.w - 30;
+        let pH = player.h - 10;
+
+        let eX = e.x + 15;
+        let eY = e.y + 15;
+        let eW = e.w - 30;
+        let eH = e.h - 15;
+
         if (!player.isInvincible &&
-            e.x < player.x + player.w &&
-            e.x + e.w > player.x &&
-            e.y < player.y + player.h &&
-            e.y + e.h > player.y) {
+            eX < pX + pW &&
+            eX + eW > pX &&
+            eY < pY + pH &&
+            eY + eH > pY) {
 
             lives--; //Take damage
             player.isInvincible = true;
@@ -186,7 +197,6 @@ function update() {
 }
 
 //7. Draw Everything to the Screen
-//7. Draw Everything to the Screen
 function draw(){
     //background
     ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
@@ -206,7 +216,7 @@ function draw(){
         
         // Draw Attack (yellow Rectangle stretching right)
         ctx.fillStyle = 'yellow';
-        ctx.fillRect(player.x + player.w, player.y + 10, 150, 10);
+        ctx.fillRect(player.x + player.w, player.y + 25, 150, 10);
     } else {
         // Draw the running sprite if not attacking
         if (!player.isInvincible || frames % 10 < 5) {
