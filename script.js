@@ -10,6 +10,7 @@ let lives = 3;
 let score = 0;
 let gameOver = false;
 let gameStarted = false;
+let spawnTimer = 90;
 const groundY = 320; // where the floor sits on the Y axis
 
 // Audio setup
@@ -72,6 +73,7 @@ function resetGame() {
     player.dy = 0;
     player.isInvincible = false;
     frames = 0;
+    spawnTimer = 90;
 }
 
 //5. Input Handling (keyboard)
@@ -132,19 +134,27 @@ function update() {
         player.isGrounded = true;
     }
 
+    spawnTimer--;
+
     //Spawn enemies every 90 frames (roughly 1.5 seconds)
-    if (frames % 90 === 0) {
+    if (spawnTimer <= 0) {
         //Generate a random number: 0,1, or 2
         let randomMarine = Math.floor(Math.random() * 3);
+
+        let currentSpeed = Math.min(12, 4 + (frames / 500));
 
         enemies.push({
             x: canvas.width, // Spawn on the far right
             y: groundY - 60, // Sit perfectly on the ground
             w: 60,
             h: 60,
-            speed: 4, // Scroll speed to the left
+            speed: currentSpeed, // Scroll speed to the left
             imageIndex: randomMarine
         });
+
+        let currentSpawnRate = Math.max(35, 90 - Math.floor(frames / 100));
+
+        spawnTimer = currentSpawnRate;
     }
 
     //Define the attack hitbox(the yellow arm)
