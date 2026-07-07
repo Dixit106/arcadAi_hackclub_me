@@ -12,6 +12,15 @@ let gameOver = false;
 let gameStarted = false;
 const groundY = 320; // where the floor sits on the Y axis
 
+// Audio setup
+const bgMusic = new Audio('ost.mp3');
+bgMusic.loop = true;
+
+const jumpSound = new Audio ('jump.mp3');
+const punchSound = new Audio('punch.mp3');
+
+let bgmStarted = false;
+
 //Image preloading
 const bgImg = new Image();
 bgImg.src = 'onepiecebackground.png';
@@ -68,6 +77,11 @@ function resetGame() {
 //5. Input Handling (keyboard)
 document.addEventListener('keydown', (e) => {
 
+    if (!bgmStarted) {
+        bgMusic.play();
+        bgmStarted = true;
+    }
+
     if (e.code === 'Space'){
         e.preventDefault();
     }
@@ -87,11 +101,18 @@ document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && player.isGrounded && !gameOver && gameStarted) {
         player.dy = player.jumpPower;
         player.isGrounded = false;
+
+        jumpSound.currentTime = 0;
+        jumpSound.play();
     }
+
     // Attack if 'F' is pressed and we aren't already attacking
     if (e.code === 'KeyF' && !player.isAttacking && !gameOver && gameStarted) {
         player.isAttacking = true;
         player.attackTimer = 8; // The attack lasts for 8 frames
+
+        punchSound.currentTime = 0;
+        punchSound.play();
     }
 });
 
