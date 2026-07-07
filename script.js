@@ -9,6 +9,7 @@ let frames = 0; // Tracks game time
 let lives = 3;
 let score = 0;
 let gameOver = false;
+let gameStarted = false;
 const groundY = 320; // where the floor sits on the Y axis
 
 //Image preloading
@@ -66,18 +67,29 @@ function resetGame() {
 
 //5. Input Handling (keyboard)
 document.addEventListener('keydown', (e) => {
+
+    if (e.code === 'Space'){
+        e.preventDefault();
+    }
+
+    if(!gameStarted && e.code === 'Enter') {
+        gameStarted = true;
+        resetGame();
+        return;
+    }
+
     //NEW: restart game if game over
     if (gameOver && e.code === 'Enter') {
         resetGame();
         return;
     }
     // Jump if space is pressed and we are on the ground
-    if (e.code === 'Space' && player.isGrounded && !gameOver) {
+    if (e.code === 'Space' && player.isGrounded && !gameOver && gameStarted) {
         player.dy = player.jumpPower;
         player.isGrounded = false;
     }
     // Attack if 'F' is pressed and we aren't already attacking
-    if (e.code === 'KeyF' && !player.isAttacking && !gameOver) {
+    if (e.code === 'KeyF' && !player.isAttacking && !gameOver && gameStarted) {
         player.isAttacking = true;
         player.attackTimer = 8; // The attack lasts for 8 frames
     }
@@ -86,7 +98,7 @@ document.addEventListener('keydown', (e) => {
 // 6. Update Game Logic (Physics, Movement, Collisions)
 function update() {
     //New: Stop updating physics if Game Over
-    if (gameOver) return;
+    if (gameOver || !gameStarted) return;
 
     //Apply gravity to player
     player.dy += player.gravity;
@@ -252,6 +264,23 @@ function draw(){
         ctx.fillText("Press ENTER to Restart", canvas.width / 2, canvas.height / 2 + 20);
 
         ctx.textAlign = 'left'; // Reset text alignment for the next frame
+    }
+     if (!gameStarted) {
+         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+         ctx.fillRect(0, 0, canvas.width, canvas.height);
+     
+         ctx.fillStyle = '#00FF00';
+         ctx.font = 'bold 40px "Comic Sans MS"';
+         ctx.textAlign = 'center';
+         ctx.fillText("LUFFY'S GRAND LINE RUN", canvas.width / 2, canvas.height / 2-20);
+     
+         if (Math.floor(Date.now() / 500) % 2 === 0) {
+             ctx.fillStyle = 'yellow';
+             ctx.font = '20px "Comic Sans MS"';
+             ctx.fillText("Press ENTER to Start", canvas.width / 2, canvas.height / 2 + 30);
+         }
+     
+         ctx.textAlign = 'left';
     }
 }
 
